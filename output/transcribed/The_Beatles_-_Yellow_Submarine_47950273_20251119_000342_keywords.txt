@@ -1,0 +1,9 @@
+句子 1: In the town where I was born, lived the man who sailed to sea
+关键词 1: In the town where I was born, lived the man who sailed to sea
+
+句子 2: And he told us of his life in the land of submarines
+关键词 2: And he told us of his life in the land of submarines
+
+句子 3: So we sailed off to the sun, till we found the sea of green
+关键词 3: So we sailed off to the sun, till we found the sea of green
+
