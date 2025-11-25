@@ -24,11 +24,11 @@ Thumbs.db
 logs/
 *.log
 
-# Output directory (optional, depending on whether you want to track output)
-output/
+# Output directory (commented out to track output files)
+# output/
 
-# Input directory (optional, if it contains large files or sensitive data)
-input/
+# Input directory (commented out to track input files)
+# input/
 
 # Temporary files
 *.tmp

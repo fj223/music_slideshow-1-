@@ -98,14 +98,11 @@ def audio_to_images_pipeline(audio_path, style="艺术风格", max_images=8, ext
                 print(f"使用简化句子: {sentences}")
             
             # 打印所有句子
+            for i, sent in enumerate(sentences, 1):
+                print(f"句子 {i}: '{sent}'")
         except Exception as e:
             print(f"警告：句子分割失败: {e}")
             # 使用默认关键词作为备用
-            sentences = [transcript[:50]] if len(transcript) > 50 else [transcript]            for i, sent in enumerate(sentences, 1):
-                print(f"句子 {i}: '{sent}'")
-        except Exception as e:
-            print(f"句子分割出错: {e}")
-            # 使用整个文本作为一个句子
             sentences = [transcript[:50]] if len(transcript) > 50 else [transcript]
             print(f"使用简化句子: {sentences}")
         
@@ -210,7 +207,9 @@ def generate_default_images(keywords, style, max_images):
             prompt = f"{keyword}，{style}，高清，8K"
             print(f"尝试生成默认图片 {i}: '{prompt}'")
             image_path = generate_image(prompt)
-            image_paths.append(image_path)
+            # 保存图片路径，只添加成功生成的图片
+            if image_path:
+                image_paths.append(image_path)
         except Exception as e:
             print(f"生成默认图片失败: {e}")
     return image_paths

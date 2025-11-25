@@ -38,7 +38,7 @@ pip install -r requirements.txt
 
 - **Windows**:
   ```bash
-  set SILICON_API_KEY=your_actual_api_key_here
+  set SILICON_API_KEY=sk-swbvirjuyutfhjkzykvziqsoeoebazzaslyiyrcgqzypngml
   ```
 
 - **Linux/Mac**:
