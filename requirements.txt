@@ -1,11 +1,29 @@
 # 项目依赖
-moviepy>=1.0.3
-pydub>=0.25.1
-openai-whisper>=20231117
+# 指定Python版本范围，确保兼容性
+# Python>=3.8,<3.11
+
+# 指定兼容版本的whisper
+openai-whisper==20231117
+
+# 其他依赖
+openai
+python-dotenv
 requests>=2.31.0
+httpx
+opencv-python
+pydub>=0.25.1
+numpy>=1.24.3
+pandas
+matplotlib
+
+# 音频处理依赖
+ffmpeg-python
+moviepy>=1.0.3
 transformers>=4.35.2
 pillow>=10.0.1
-numpy>=1.24.3
+
+# 用于环境变量管理
+environs
 
 # 运行命令示例
 # 运行音频转图片

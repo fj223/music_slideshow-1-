@@ -98,7 +98,10 @@ def audio_to_images_pipeline(audio_path, style="艺术风格", max_images=8, ext
                 print(f"使用简化句子: {sentences}")
             
             # 打印所有句子
-            for i, sent in enumerate(sentences, 1):
+        except Exception as e:
+            print(f"警告：句子分割失败: {e}")
+            # 使用默认关键词作为备用
+            sentences = [transcript[:50]] if len(transcript) > 50 else [transcript]            for i, sent in enumerate(sentences, 1):
                 print(f"句子 {i}: '{sent}'")
         except Exception as e:
             print(f"句子分割出错: {e}")
@@ -107,82 +110,88 @@ def audio_to_images_pipeline(audio_path, style="艺术风格", max_images=8, ext
             print(f"使用简化句子: {sentences}")
         
         # 4. 提取关键词或使用完整句子
-        keywords = []
-        if extract_keywords:
-            print("提取关键词...")
-            for sentence in sentences:
-                # 简单处理：取句子前10个字符作为关键词
-                keyword = sentence[:10].strip()
-                # 确保关键词不为空
-                if not keyword:
-                    keyword = "音乐"
-                keywords.append(keyword)
-                print(f"关键词: '{keyword}'")
-        else:
-            keywords = sentences
-            print(f"使用完整句子作为关键词，共 {len(keywords)} 个")
-        
-        # 5. 保存转录结果和关键词
-        print("保存转录结果和关键词...")
-        output_dir = Path("output/transcribed")
-        output_dir.mkdir(parents=True, exist_ok=True)
-        
-        # 生成时间戳
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        audio_name = os.path.splitext(os.path.basename(audio_path))[0]
-        
-        # 保存转录文本
-        transcript_file = output_dir / f"{audio_name}_{timestamp}_transcript.txt"
-        with open(transcript_file, "w", encoding="utf-8") as f:
-            f.write(transcript)
-        print(f"转录结果已保存到: {transcript_file}")
-        
-        # 保存句子和关键词
-        keywords_file = output_dir / f"{audio_name}_{timestamp}_keywords.txt"
-        with open(keywords_file, "w", encoding="utf-8") as f:
-            for i, (sentence, keyword) in enumerate(zip(sentences, keywords), 1):
-                f.write(f"句子 {i}: {sentence}\n")
-                f.write(f"关键词 {i}: {keyword}\n\n")
-        print(f"关键词已保存到: {keywords_file}")
-        
-        # 6. 生成图片
-        if len(keywords) < max_images:
-            _fill = ["音乐","艺术","自然","风景","创意"]
-            i = 0
-            while len(keywords) < max_images:
-                keywords.append(_fill[i % len(_fill)])
-                i += 1
-        print(f"开始生成图片，风格: {style}，最大数量: {max_images}")
-        debug_print(f"使用的关键词列表: {keywords[:max_images]}")
-        
-        # 为每个关键词单独生成图片，添加更多错误处理
-        image_paths = []
-        for i, keyword in enumerate(keywords[:max_images], 1):
-            try:
-                print(f"正在生成第 {i}/{min(len(keywords), max_images)} 张图片，关键词: '{keyword}'")
-                prompt = f"{keyword}，{style}，高清，8K"
-                debug_print(f"使用提示词: '{prompt}'")
-                
-                # 直接调用 generate_image 而不是批量函数，添加更多错误处理
-                image_path = generate_image(prompt)
-                image_paths.append(image_path)
-                print(f"✅ 第 {i} 张图片生成成功: {image_path}")
-            except Exception as e:
-                print(f"❌ 第 {i} 张图片生成失败: {e}")
-                # 继续尝试下一个关键词
-                continue
-        
-        # 检查是否生成了图片
-        if not image_paths:
-            print("警告：没有成功生成任何图片，使用默认关键词重试")
-            return generate_default_images(["音乐", "艺术", "自然", "风景"], style, max_images)
-        
-        print(f"\n图片生成完成!")
-        print(f"总共成功生成 {len(image_paths)} 张图片")
-        for path in image_paths:
-            print(f"- {path}")
-        
-        return image_paths
+        print("处理文本内容...")
+        try:
+            keywords = []
+            if extract_keywords:
+                print("提取关键词...")
+                for sentence in sentences:
+                    # 检查句子长度
+                    if len(sentence) < 5:
+                        print(f"跳过太短的句子: {sentence}")
+                        continue
+                    
+                    # 简单处理：取句子前10个字符作为关键词
+                    keyword = sentence[:10].strip()
+                    # 确保关键词不为空
+                    if not keyword:
+                        keyword = "音乐"
+                    keywords.append(keyword)
+                    print(f"关键词: '{keyword}'")
+            else:
+                # 过滤短句子
+                keywords = [s for s in sentences if len(s) >= 5]
+                print(f"使用完整句子作为关键词，共 {len(keywords)} 个")
+            
+            # 限制关键词数量并填充
+            keywords = keywords[:max_images]
+            if len(keywords) < max_images:
+                _fill = ["音乐","艺术","自然","风景","创意"]
+                i = 0
+                while len(keywords) < max_images:
+                    keywords.append(_fill[i % len(_fill)])
+                    i += 1
+            
+            # 5. 保存转录结果和关键词
+            print("保存转录结果和关键词...")
+            output_dir = Path("output/transcribed")
+            output_dir.mkdir(parents=True, exist_ok=True)
+            
+            # 生成时间戳
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            audio_name = os.path.splitext(os.path.basename(audio_path))[0]
+            
+            # 保存转录文本
+            transcript_file = output_dir / f"{audio_name}_{timestamp}_transcript.txt"
+            with open(transcript_file, "w", encoding="utf-8") as f:
+                f.write(transcript)
+            print(f"转录结果已保存到: {transcript_file}")
+            
+            # 保存句子和关键词
+            keywords_file = output_dir / f"{audio_name}_{timestamp}_keywords.txt"
+            with open(keywords_file, "w", encoding="utf-8") as f:
+                for i, (sentence, keyword) in enumerate(zip(sentences[:len(keywords)], keywords), 1):
+                    f.write(f"句子 {i}: {sentence}\n")
+                    f.write(f"关键词 {i}: {keyword}\n\n")
+            print(f"关键词已保存到: {keywords_file}")
+            
+            # 6. 生成图片
+            print(f"开始生成图片，风格: {style}，最大数量: {max_images}")
+            debug_print(f"使用的关键词列表: {keywords[:max_images]}")
+            
+            # 使用批量生成图片函数
+            image_paths = create_images_for_sentences(keywords[:max_images], style, max_images)
+            
+            # 检查是否成功生成图片
+            if not image_paths:
+                print("警告：未能生成任何图片，尝试使用默认关键词")
+                # 使用默认关键词作为备用
+                default_keywords = ["音乐", "艺术", "自然", "风景", "创意"]
+                image_paths = create_images_for_sentences(default_keywords[:max_images], style, max_images)
+            
+            print(f"\n图片生成完成!")
+            print(f"总共成功生成 {len(image_paths)} 张图片")
+            for path in image_paths:
+                print(f"- {path}")
+            
+            return image_paths
+        except Exception as e:
+            print(f"错误：生成图片过程中发生错误: {e}")
+            # 尝试使用默认图片生成
+            print("尝试使用默认关键词生成图片...")
+            default_keywords = ["音乐", "艺术", "自然", "风景", "创意"]
+            image_paths = create_images_for_sentences(default_keywords[:max_images], style, max_images)
+            return image_paths
         
     except Exception as e:
         print(f"❌ 处理流程出错: {e}")
