@@ -1,0 +1,16 @@
+# 项目依赖
+moviepy>=1.0.3
+pydub>=0.25.1
+openai-whisper>=20231117
+requests>=2.31.0
+transformers>=4.35.2
+pillow>=10.0.1
+numpy>=1.24.3
+
+# 运行命令示例
+# 运行音频转图片
+# python "audio_to_images.py" --audio "input/audio/The_Beatles_-_Yellow_Submarine_47950273.mp3" --max-images 5
+# python "audio_to_images.py" --audio "input/audio/Autumn-audio (1).mp3" --max-images 5
+# 运行音频→视频
+# python "audio_to_video_pipeline.py" --audio "input/audio/Autumn-audio (1).mp3" --max-images 6 --duration 4.0
+# python "audio_to_video_pipeline.py" --audio "input/audio/The_Beatles_-_Yellow_Submarine_47950273.mp3" --max-images 6 --duration 4.0
